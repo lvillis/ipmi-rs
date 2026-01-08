@@ -1,6 +1,6 @@
 [package]
 name = "ipmi"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 rust-version = "1.92"
 description = "IPMI v2.0 RMCP+ client library (async-first + optional blocking) with session authentication, integrity and confidentiality."
