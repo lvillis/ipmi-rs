@@ -1,0 +1,60 @@
+[package]
+name = "ipmi"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.92"
+description = "Blocking IPMI v2.0 RMCP+ client library with session authentication, integrity and confidentiality."
+license = "MIT"
+readme = "README.md"
+keywords = ["ipmi", "rmcp", "rmcpplus", "bmc"]
+categories = ["network-programming"]
+include = [
+  "Cargo.toml",
+  "README.md",
+  "LICENSE",
+  "CHANGELOG.md",
+  "src/**",
+  "examples/**",
+  "tests/**",
+]
+
+[workspace]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.92"
+license = "MIT"
+
+# Third-party dependencies must be declared here and inherited by member crates.
+[workspace.dependencies]
+# Error handling
+thiserror = { version = "2.0.17", default-features = false, features = ["std"] }
+
+# Randomness (used for session IDs, nonces, IVs)
+rand = { version = "0.9.2", default-features = false, features = ["std", "thread_rng"] }
+
+# Cryptography (RustCrypto)
+hmac = { version = "0.12.1", default-features = false, features = ["std"] }
+sha1 = { version = "0.10.6", default-features = false, features = ["std"] }
+aes = { version = "0.8.4", default-features = false }
+
+# Constant-time comparisons
+subtle = { version = "2.6.1", default-features = false, features = ["std"] }
+
+# Secret zeroization
+zeroize = { version = "1.8.2", default-features = false, features = ["std"] }
+
+
+[dependencies]
+thiserror = { workspace = true }
+rand = { workspace = true }
+hmac = { workspace = true }
+sha1 = { workspace = true }
+aes = { workspace = true }
+subtle = { workspace = true }
+zeroize = { workspace = true }
+
+[features]
+# No default optional features.
+default = []
