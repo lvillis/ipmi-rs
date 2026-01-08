@@ -3,6 +3,7 @@ use std::net::{SocketAddr, UdpSocket};
 use std::time::Duration;
 
 use crate::error::{Error, Result};
+use crate::transport::Transport;
 
 /// Maximum UDP payload we accept.
 ///
@@ -10,14 +11,15 @@ use crate::error::{Error, Result};
 const DEFAULT_MAX_PACKET_SIZE: usize = 4096;
 
 /// Blocking UDP transport for RMCP+/IPMI.
-pub(crate) struct UdpTransport {
+pub struct UdpTransport {
     socket: UdpSocket,
     max_packet_size: usize,
     max_attempts: u32,
 }
 
 impl UdpTransport {
-    pub(crate) fn connect(target: SocketAddr, timeout: Duration, retries: u32) -> Result<Self> {
+    /// Connect a UDP socket to an RMCP+ target.
+    pub fn connect(target: SocketAddr, timeout: Duration, retries: u32) -> Result<Self> {
         let bind_addr = match target {
             SocketAddr::V4(_) => "0.0.0.0:0",
             SocketAddr::V6(_) => "[::]:0",
@@ -34,7 +36,7 @@ impl UdpTransport {
         })
     }
 
-    pub(crate) fn send_recv(&self, request: &[u8]) -> Result<Vec<u8>> {
+    fn send_recv_impl(&self, request: &[u8]) -> Result<Vec<u8>> {
         let mut buf = vec![0u8; self.max_packet_size];
 
         for attempt in 0..self.max_attempts {
@@ -57,6 +59,12 @@ impl UdpTransport {
         }
 
         Err(Error::Timeout)
+    }
+}
+
+impl Transport for UdpTransport {
+    fn send_recv(&self, request: &[u8]) -> Result<Vec<u8>> {
+        self.send_recv_impl(request)
     }
 }
 

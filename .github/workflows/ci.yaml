@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,5 +22,36 @@ jobs:
       - name: cargo clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 
-      - name: cargo test
+      - name: cargo doc
+        run: cargo doc --no-deps
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        mode: [default, async-only, blocking-only, all-features]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.92.0
+
+      - name: cargo test (default)
+        if: matrix.mode == 'default'
         run: cargo test --all
+
+      - name: cargo test (async only)
+        if: matrix.mode == 'async-only'
+        run: cargo test --no-default-features --features async
+
+      - name: cargo test (blocking only)
+        if: matrix.mode == 'blocking-only'
+        run: cargo test --no-default-features --features blocking
+
+      - name: cargo test (all features)
+        if: matrix.mode == 'all-features'
+        run: cargo test --all-features

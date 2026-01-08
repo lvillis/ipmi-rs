@@ -4,6 +4,7 @@ use crate::crypto::{
 };
 use crate::error::{Error, Result};
 use crate::types::PrivilegeLevel;
+use zeroize::Zeroize;
 
 /// RMCP header values.
 const RMCP_VERSION: u8 = 0x06;
@@ -65,6 +66,13 @@ impl SecurityContext {
     pub(crate) fn auth_code_len(&self) -> usize {
         // HMAC-SHA1-96
         12
+    }
+}
+
+impl Drop for SecurityContext {
+    fn drop(&mut self) {
+        self.k1.zeroize();
+        self.aes_key.zeroize();
     }
 }
 
